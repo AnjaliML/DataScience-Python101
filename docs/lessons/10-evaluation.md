@@ -72,8 +72,9 @@ test set for one final estimate after the choice is fixed.
 from sklearn.model_selection import StratifiedKFold, cross_val_predict
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=101)
+folds = list(cv.split(X_train, y_train))
 oof_renewal_probability = cross_val_predict(
-    model, X_train, y_train, cv=cv, method="predict_proba",
+    model, X_train, y_train, cv=folds, method="predict_proba",
 )[:, 1]
 oof_risk_probability = 1.0 - oof_renewal_probability
 
@@ -89,35 +90,54 @@ for candidate in (0.30, 0.50, 0.70):
 eligible = [row for row in threshold_rows if row[2] >= 0.70 and row[3] <= 100]
 if not eligible:
     raise ValueError("no threshold meets recall and capacity constraints")
-threshold = float(max(eligible, key=lambda row: row[1])[0])
+threshold = float(max(eligible, key=lambda row: (row[1], row[0]))[0])
 ~~~
 
 Choose using a rule stated before looking at the test result—for example, the
 highest precision among thresholds that meet a required recall and capacity.
+If candidates have equal precision, this example chooses the higher threshold,
+which cannot flag more rows than a lower tied threshold. If no candidate meets
+both constraints, it stops instead of weakening them after seeing results.
+Here, `100` is an illustrative capacity for a scoring batch the same size as
+the training sample. In practice, define capacity for the real decision period;
+for a strict fixed capacity, ranking probabilities and taking the top 100 may be
+clearer than treating 100 as a portable threshold constraint.
 
-### Estimate variability
+### Summarise training-fold variation at the chosen threshold
 
-Cross-validation exposes how performance changes across training partitions:
+Every out-of-fold probability was produced by a model that did not train on
+that row. Reuse those probabilities to calculate each fold's metrics at the
+chosen risk threshold:
 
 ~~~python
-from sklearn.model_selection import cross_validate
-
-fold_scores = cross_validate(
-    model, X_train, y_train_risk, cv=cv,
-    scoring=["accuracy", "precision", "recall", "f1", "roc_auc"],
-)
 metric_names = ("accuracy", "precision", "recall", "f1", "roc_auc")
+fold_values = {name: [] for name in metric_names}
+
+for _, validation_positions in folds:
+    fold_truth = y_train_risk.iloc[validation_positions]
+    fold_probabilities = oof_risk_probability[validation_positions]
+    fold_predictions = (fold_probabilities >= threshold).astype(int)
+    values = metric_values(fold_truth, fold_predictions, fold_probabilities)
+    for name in metric_names:
+        fold_values[name].append(values[name])
+
 cv_summary = {
     name: {
-        "mean": float(fold_scores[f"test_{name}"].mean()),
-        "std": float(fold_scores[f"test_{name}"].std(ddof=1)),
+        "mean": float(np.mean(fold_values[name])),
+        "std": float(np.std(fold_values[name], ddof=1)),
     }
     for name in metric_names
 }
 ~~~
 
-`cross_validate` fits the risk target in each fold. Fold standard deviation is
-variation across these partitions, not a confidence interval for all customers.
+This does **not** create a second, untouched validation result: the pooled
+out-of-fold predictions also selected `threshold`. The fold summary is a useful
+stability diagnostic after that selection, and its standard deviation is
+variation across these particular partitions—not a confidence interval for all
+customers. The held-out test set remains the one final estimate of the complete
+model-and-threshold procedure. ROC-AUC uses the fold probabilities and does not
+depend on the chosen threshold; the other four metrics use `fold_predictions`
+created with that threshold.
 
 ## Check
 
@@ -157,6 +177,7 @@ metrics_payload = {
     "positive_class": "not_renewed",
     "threshold": threshold,
     "threshold_rule": "highest precision with recall >= 0.70 and flagged <= 100",
+    "baseline_rule": "most frequent training label",
     "baseline": baseline_metrics,
     "logistic_regression": model_metrics,
     "cross_validation": cv_summary,
@@ -178,3 +199,8 @@ assert metrics_payload["positive_class"] == "not_renewed"
 
 An honest evaluation exposes every choice in `metrics_payload`. It bounds a
 historical estimate; it does not show that contacting someone changes renewal.
+
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → rubric → worked reasoning](../practice/10-evaluation.md).
+You will audit one frozen threshold before transferring to a different error-cost policy.

@@ -1,177 +1,250 @@
-# 13 — Capstone: one question, one reproducible claim
+# 13 — Capstone studio: audit a reference, then own a claim
 
-The capstone is a small data-science argument that another person can rebuild,
-inspect, and challenge. Its goal is not the highest model score. Its goal is a
-visible chain from question and raw rows to evidence and limitations.
+The course includes a finished analysis capsule. Running it is valuable, but it
+is **not** a learner capstone. This studio therefore has two explicitly
+different tracks:
 
-## Frame
+| Track | Purpose | Evidence of completion |
+| --- | --- | --- |
+| **A · Reference audit** | reproduce, inspect, and challenge supplied expert work | an audit note that traces and tests one claim |
+| **B · Learner-owned capstone** | make and defend your own analytical choices | your own question, functions, tests, artifacts, and command |
 
-Use the supplied synthetic `data/customer_renewals.csv` and answer one bounded
-question:
+Do Track A first. Then complete Track B for the course capstone. If your goal is
+code review rather than course completion, Track A can stand alone.
 
-> Using information available before renewal, how well does a simple model
-> identify customers who will not renew compared with a majority baseline?
+## Shared frame
 
-The unit is one renewal opportunity. “Not renewed” is the event to flag. The
-analysis is predictive, not causal: it cannot establish which action would make
-a customer renew.
+A capstone is a small data-science argument that another person can rebuild,
+inspect, and challenge. Its goal is not the highest score or the most artifacts.
+Its goal is a visible chain:
 
-## Predict
+```text
+question → data → transformation → validation → insight
+```
 
-Before running the workflow, write down:
+Before either track, write predictions that you will not rewrite after seeing
+the result:
 
-1. the required columns and allowed target values;
-2. which fields are known before the decision;
-3. likely missingness, range, duplicate, and leakage failures;
-4. the majority-class baseline;
-5. the direction of the precision–recall tradeoff as the threshold changes;
-6. which subgroup may have the least reliable estimate and why.
+1. required fields, row unit, and allowed values;
+2. timing and likely leakage risks;
+3. missingness, range, duplicate, and coverage failures;
+4. an appropriate simple comparison or baseline;
+5. the result most likely to be unstable;
+6. one outcome that would make you report “not enough evidence.”
 
-Save these predictions in the project README. Do not rewrite them after seeing
-the result; explain any disagreement instead.
+## Track A — Reference audit
 
-## Build
+### Reproduce the supplied capsule
 
-One command must rebuild the public artifacts from a clean output directory:
+This command deliberately calls the **finished reference implementation**:
 
-~~~bash
+```bash
 uv run ds-python101 --input data/customer_renewals.csv \
-  --output-dir build/capstone --seed 101
-~~~
+  --output-dir build/reference-audit --seed 101
+```
 
-The directory must contain exactly these learner-facing outputs:
+It should create:
 
-~~~text
-build/capstone/
+```text
+build/reference-audit/
 ├── cleaned.csv
 ├── summary.json
 ├── renewal-by-plan.png
 ├── metrics.json
 ├── confusion-matrix.png
 └── manifest.sha256
-~~~
+```
 
-### `cleaned.csv`
+Running the command proves that the packaged workflow can execute in your
+environment. It does not prove that its question, data policy, model, threshold,
+or conclusion is correct.
 
-Preserve the row unit and customer identifier. Normalize text, parse numeric
-columns, convert renewal to a documented binary value, retain meaningful
-missingness indicators, reject duplicate IDs, and leave the raw CSV unchanged.
-Write columns in a stable order.
+### Inspect from claim back to source
 
-### `summary.json`
+Choose one value or statement in `metrics.json` or a figure. Trace it backward:
 
-Record source and cleaned row counts, original missingness, plan and target
-counts, renewal rate, feature list, target definition, split seed, test
-fraction, and every exclusion or repair.
+1. Which held-out rows and positive-class convention define the metric?
+2. Which frozen threshold turns probabilities into decisions?
+3. Which training-fold rule selected that threshold?
+4. Which preprocessing and model were fitted on training rows?
+5. Which cleaned fields feed those transformations?
+6. Which raw bytes and question contract give those fields meaning?
 
-Serialize with sorted keys and no current timestamp so identical inputs and
-code produce identical bytes.
+Record file names, field names, and checks rather than saying “the library
+handles it.”
 
-### `renewal-by-plan.png`
+### Audit each public artifact
 
-Build a supporting table first: one row per plan with customer count and
-observed renewal rate. Plot a zero-based rate axis, label group sizes, and use
-language such as “observed association.” The figure does not show that changing
-a customer’s plan would change renewal.
+- **`cleaned.csv`** — one row per unique account, stable columns, documented
+  conversions, unchanged raw input, and visible missingness policy.
+- **`summary.json`** — source checksum, row counts, original missingness,
+  target definition, features, split seed, exclusions, and repairs.
+- **`renewal-by-plan.png`** — supporting table, zero-based rate scale, group
+  counts, readable labels, and association-not-causation language.
+- **`metrics.json`** — explicit positive class, baseline, threshold and training
+  rule, holdout metrics, cross-validation variation, subgroup counts, and
+  limitations.
+- **`confusion-matrix.png`** — labelled actual and predicted axes, integer
+  counts, consistent positive class, and cells summing to holdout size.
+- **`manifest.sha256`** — one sorted checksum per generated public artifact and
+  a reproducible result on a second identical run.
 
-### `metrics.json`
+### Challenge one choice
 
-Fit on training rows only. The exact top-level keys are `positive_class`,
-`threshold`, `threshold_rule`, `baseline`, `logistic_regression`,
-`cross_validation`, `confusion_matrix`, `holdout_rows`, `subgroups`, and
-`limitations`. Both model dictionaries contain `accuracy`, `precision`,
-`recall`, `f1`, and `roc_auc`. Each cross-validation metric contains `mean` and
-`std`. Each subgroup record contains `plan`, `rows`, `recall`,
-`false_positives`, and `false_negatives`.
+Change exactly one safe input or declared condition—for example the seed or a
+training-fold threshold constraint. Predict which outputs should change,
+rebuild into a different directory, and compare. Do not hand-edit generated
+artifacts.
 
-Choose the threshold from training folds, then evaluate it once on the held-out
-test set. Do not choose it because the test result looks attractive.
+Your Track A deliverable is a short audit note:
 
-### `confusion-matrix.png`
+```text
+claim traced:
+source-to-claim path:
+checks that passed:
+choice challenged:
+predicted change:
+observed change:
+remaining limitation:
+```
 
-Label actual and predicted axes, use the same positive-class convention as
-`metrics.json`, and show integer counts. The four cells must sum to the number
-of held-out rows.
+## Track B — Learner-owned capstone
 
-### `manifest.sha256`
+### Choose a question the reference does not answer
 
-List a SHA-256 checksum and relative path for each generated artifact except the
-manifest itself. Sort entries by path. Record the raw input checksum separately
-in `summary.json` so a reviewer can detect any byte-level change.
+You may use the course CSV or another public/synthetic dataset whose provenance
+you can document. Suitable course-data questions include:
 
-## Check
+- How does missing satisfaction coverage differ by plan, and where is the
+  descriptive comparison least reliable?
+- What uncertainty surrounds plan-level renewal rates without ranking
+  individual accounts?
+- How does a simple usage-based review rule compare with a capacity-matched
+  rule based only on the training data?
+- Which pre-decision table-quality failures would block a weekly analysis, and
+  how should they be reported?
 
-The one command should stop with a non-zero exit status if any required check
-fails. At minimum, verify:
+You may propose another bounded question. A descriptive capstone can be as
+rigorous as a model when the evidence and limitations are stronger.
 
-~~~python
-assert cleaned["customer_id"].notna().all()
-assert cleaned["customer_id"].is_unique
-assert cleaned["renewed"].isin([0, 1]).all()
-assert set(X_train.index).isdisjoint(X_test.index)
-assert len(test_predictions) == len(y_test)
-assert confusion_matrix_values.sum() == len(y_test)
-assert all(0.0 <= value <= 1.0 for value in reported_metrics.values())
-~~~
+### Pass the ownership gate
 
-Also check that preprocessing has not been fitted before splitting, all six
-artifacts exist and are non-empty, the figures remain readable at final size,
-and a second run produces the same checksums.
+Your project must make at least **two material choices** that are not inherited
+unchanged from the reference:
 
-Include tests for an unknown target label, duplicate customer ID, unseen test
-category, missing numeric value, deterministic split, and unchanged raw input.
+- question and decision;
+- target, outcome, or statistic;
+- fields and timing boundary;
+- missingness or exclusion policy;
+- comparison or baseline;
+- figure or public artifact;
+- validation rule tied to the new claim.
+
+Create your own module and command. Calling the supplied `build_capsule`
+function, wrapping the existing `ds-python101` command, or merely renaming its
+outputs does not pass Track B.
+
+### Define the contract before implementation
+
+Write these two small contracts:
+
+```text
+QUESTION CONTRACT
+decision:
+population and row unit:
+timing:
+outcome or statistic:
+permitted fields:
+comparison:
+success and stop rules:
+
+OUTPUT CONTRACT
+one exact rebuild command:
+public files and what each proves:
+deterministic inputs and seeds:
+failure exit behavior:
+manifest policy:
+```
+
+Use a new output directory such as `build/learner-capstone/`. One command must
+rebuild it from raw input. Stable JSON/CSV, at least one purposeful figure, a
+plain-language conclusion, and a checksum manifest are enough; do not copy the
+reference's six-file shape unless your question genuinely needs it.
+
+### Build in vertical passes
+
+1. Validate the row unit, required fields, and raw-input checksum.
+2. Implement one small transformation in a pure function with boundary tests.
+3. Produce one checked table that directly answers part of the question.
+4. Render one figure from that table and inspect it at final size.
+5. Add the simple comparison, uncertainty estimate, or model required by the
+   question—no more.
+6. Write the bounded conclusion and concrete limitations.
+7. Connect the steps through one command and a deterministic manifest.
+8. Delete the output directory, rebuild, rerun, and ask a peer to reproduce it
+   without verbal help.
+
+### Minimum checks
+
+Adapt these checks to your question rather than copying names blindly:
+
+- required fields and allowed values fail with useful messages;
+- row keys match the declared grain;
+- raw input bytes do not change;
+- exclusions and conversion failures reconcile to source counts;
+- every reported rate or probability is in `[0, 1]`;
+- group totals reconcile to the intended unit;
+- any train/test indices are disjoint and preprocessing fits on training only;
+- figure values agree with their supporting table;
+- every public artifact exists, is non-empty, and is in the manifest;
+- a second identical run produces identical bytes or documented exceptions.
 
 ## Explain
 
-Write the final explanation in this order:
+Write the final learner-owned explanation in this order:
 
-1. **Question:** decision, row unit, prediction time, target, and baseline.
-2. **Data:** source, schema, missingness, cleaning policy, and exclusions.
-3. **Transformation:** split, preprocessing, model, seed, and threshold rule.
-4. **Validation:** tests, baseline comparison, cross-validation, and held-out
-   metrics.
+1. **Question:** decision, row unit, timing, outcome/statistic, and comparison.
+2. **Data:** provenance, schema, missingness, coverage, and exclusions.
+3. **Transformation:** named steps, policies, seed, and any model or interval.
+4. **Validation:** tests, independent checks, comparison, and uncertainty.
 5. **Insight:** the strongest supported pattern in plain language.
-6. **Limitations:** sampling, measurement, drift, subgroup size, and the gap
-   between prediction and intervention.
+6. **Limitations:** sampling, measurement, subgroup size, drift, and causal
+   boundary.
 
-A useful conclusion can be “the model did not improve enough over the
-baseline.” Do not search through features, seeds, thresholds, and metrics until
-one result looks impressive and then hide that search.
+A useful conclusion can be “the evidence does not improve enough over the
+baseline” or “this subgroup is too small for a stable comparison.” Honest
+stopping is part of the result.
 
 ## Review rubric
 
-| Criterion | 0 — Missing | 1 — Partial | 2 — Convincing |
-| --- | --- | --- | --- |
-| Question | vague task | target or decision stated | unit, timing, target, baseline, and error cost are explicit |
-| Data | unexplained CSV | basic schema | provenance, grain, timing, missingness, and cleaning policy |
-| Transformation | tangled notebook state | mostly repeatable | split-first tested pipeline with explicit seed and threshold rule |
-| Validation | one preferred score | baseline or holdout | baseline, multiple metrics, CV variation, confusion matrix, and tests |
-| Insight | unsupported claim | pattern described | bounded claim tied directly to tables and figures |
-| Reproducibility | manual steps | documented commands | clean one-command rebuild, locked environment, stable artifacts, manifest |
-| Limitations | absent | generic caveat | concrete coverage, uncertainty, subgroup, drift, and causal limits |
+Score each card 0 (missing), 1 (partial), or 2 (convincing):
 
-Aim for no zero in any row. Extra models, dashboards, and decorative plots do
-not compensate for a missing question or invalid split.
+- **Question:** unit, timing, statistic/outcome, comparison, and practical
+  consequence; error cost when the project supports a prediction decision.
+- **Data:** provenance, grain, coverage, missingness, and unchanged raw input.
+- **Transformation:** small named steps with explicit policy and no hidden state.
+- **Validation:** boundaries, an independent check, and an honest comparison.
+- **Insight:** a bounded claim tied directly to visible evidence.
+- **Reproducibility:** locked environment, one command, stable outputs, manifest.
+- **Independence:** at least two material choices owned by the learner.
+- **Limitations:** concrete uncertainty, subgroup, drift, and causal bounds.
 
-## Practice
+Aim for no zero and at least 12 of 16 points. Extra models, dashboards, and
+decorative plots do not compensate for an invalid question or split.
 
-Build the capstone in passes:
+## Guided practice journey
 
-1. make schema and cleaning tests pass, then write cleaned data and summary;
-2. create the plan summary and figure;
-3. fit the dummy baseline and logistic pipeline;
-4. select a threshold with training folds and evaluate once;
-5. add subgroup and error analysis;
-6. write the manifest, rebuild from empty, and ask a peer to reproduce it.
+[Work through Try → Hint 1 → Hint 2 → rubric → worked reasoning](../practice/13-capstone.md).
+The studio turns Track A inspection into a deliberately different Track B project.
 
 ## Keep going
 
-The course ends with a workflow, not a final algorithm:
+Carry the course sequence into unfamiliar work:
 
-~~~text
+```text
 question → data → transformation → validation → insight
-~~~
+```
 
-Carry that sequence into unfamiliar datasets. Predict before running, preserve
-row meaning, reserve independent evidence, compare with a baseline, make errors
-visible, and say where the claim must stop.
+Predict before running, preserve row meaning, reserve independent evidence,
+compare with a simple reference, make errors visible, and say where the claim
+must stop.

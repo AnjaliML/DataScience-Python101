@@ -173,6 +173,11 @@ A small p-value is limited evidence against one null model. It does not repair b
 
 Summarize satisfaction with center and spread; bootstrap renewal rate; compare support tickets between renewal groups with an effect and interval; change the bootstrap seed and explain the movement; choose a meaningful threshold before calculating; and name two plausible confounders. Write each conclusion as an estimate, uncertainty statement, and limitation.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → rubric → worked reasoning](../practice/08-statistics.md).
+You will complete one interval estimate before transferring the reasoning to a group effect.
+
 ## Keep going
 
 You should now be able to explain why center and spread belong together, how resampling reveals sampling variability, what confidence intervals promise, why p-values are not verdicts or effect sizes, why practical and statistical significance differ, and why correlation is not causation. The goal is a calibrated claim: what was observed, how it may vary, its assumptions, and where it must stop.

@@ -7,8 +7,12 @@ repo_name: AnjaliML/DataScience-Python101
 edit_uri: edit/main/docs/
 copyright: Copyright &copy; 2026 Anjali Suman · MIT License
 
+exclude_docs: |
+  overrides/
+
 theme:
   name: material
+  custom_dir: docs/overrides
   language: en
   font: false
   palette:
@@ -38,6 +42,7 @@ nav:
   - Start:
       - Course overview: start/overview.md
       - Set up once: start/setup.md
+      - Your first 15 minutes: start/first-script.md
       - How to learn: start/how-to-learn.md
   - Lessons:
       - "01 · Ask an answerable question": lessons/01-questions.md
@@ -53,6 +58,21 @@ nav:
       - "11 · Reproducible projects": lessons/11-reproducibility.md
       - "12 · Turn analysis into a tool": lessons/12-tools.md
       - "13 · Capstone": lessons/13-capstone.md
+  - Practice:
+      - How practice works: practice/index.md
+      - "01 · Question contract": practice/01-questions.md
+      - "02 · Values and expressions": practice/02-python-basics.md
+      - "03 · Functions and control flow": practice/03-functions-control.md
+      - "04 · NumPy shapes": practice/04-numpy.md
+      - "05 · pandas operations": practice/05-pandas.md
+      - "06 · Cleaning policy": practice/06-cleaning.md
+      - "07 · Honest visual": practice/07-visualization.md
+      - "08 · Uncertainty": practice/08-statistics.md
+      - "09 · Baseline model": practice/09-modeling.md
+      - "10 · Evaluation": practice/10-evaluation.md
+      - "11 · Reproducibility": practice/11-reproducibility.md
+      - "12 · Command-line tool": practice/12-tools.md
+      - "13 · Capstone studio": practice/13-capstone.md
   - Reference:
       - Python syntax map: reference/syntax-map.md
       - Command line and Git: reference/command-line-git.md
@@ -64,6 +84,9 @@ nav:
 
 extra_css:
   - stylesheets/extra.css
+
+extra_javascript:
+  - javascripts/accessibility.js
 
 markdown_extensions:
   - abbr
@@ -79,6 +102,7 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
+  - pymdownx.keys
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true

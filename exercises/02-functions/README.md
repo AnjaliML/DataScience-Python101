@@ -26,7 +26,8 @@ uv run pytest -q
 ```
 
 Add one test that distinguishes your chosen policy from a tempting but invalid
-implementation.
+implementation. In particular, confirm that `(1, 0, 1)` raises `ValueError`:
+the contract accepts a `list`, not every iterable with the same values.
 
 ## Explain
 

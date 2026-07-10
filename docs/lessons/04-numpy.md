@@ -179,6 +179,11 @@ Then deliberately try to subtract an array of shape `(2,)` from your `(5, 3)` ma
 Finally, add a float column representing satisfaction score. Decide whether to
 combine it with the integer matrix, and predict the resulting common dtype.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/04-numpy.md).
+You will complete column standardisation before diagnosing new shape alignments.
+
 ## Keep going
 
 Before moving on, you should be able to state an expected shape before every indexing, masking, reduction, and broadcasting operation.

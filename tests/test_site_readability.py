@@ -8,6 +8,10 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 CSS_PATH = ROOT / "docs" / "stylesheets" / "extra.css"
 README_PATH = ROOT / "README.md"
+MKDOCS_PATH = ROOT / "mkdocs.yml"
+FONT_PATH = ROOT / "docs" / "assets" / "fonts"
+OVERRIDES_PATH = ROOT / "docs" / "overrides" / "partials"
+ACCESSIBILITY_JS_PATH = ROOT / "docs" / "javascripts" / "accessibility.js"
 
 
 def _block(css: str, selector: str) -> str:
@@ -112,6 +116,108 @@ def test_palette_text_meets_wcag_aa(
 
     ratio = _contrast(_resolve(foreground, variables), _resolve(background, variables))
     assert ratio >= 4.5, f"{scheme} {foreground} on {background}: {ratio:.2f}:1"
+
+
+@pytest.mark.parametrize(
+    ("scheme", "foreground", "background", "minimum"),
+    [
+        ("ds-light", "--ds-copy", "--md-code-bg-color--lighter", 4.5),
+        ("ds-dark", "--ds-copy", "--md-code-bg-color--lighter", 4.5),
+        ("ds-light", "--ds-gridline", "--md-default-bg-color", 3.0),
+        ("ds-dark", "--ds-gridline", "--md-default-bg-color", 3.0),
+    ],
+)
+def test_audited_controls_have_visible_contrast(
+    scheme: str,
+    foreground: str,
+    background: str,
+    minimum: float,
+) -> None:
+    css = CSS_PATH.read_text(encoding="utf-8")
+    variables = _variables(_block(css, ":root"))
+    variables.update(_variables(_block(css, f'[data-md-color-scheme="{scheme}"]')))
+
+    ratio = _contrast(_resolve(foreground, variables), _resolve(background, variables))
+    assert ratio >= minimum, f"{scheme} {foreground} on {background}: {ratio:.2f}:1"
+
+
+@pytest.mark.parametrize("scheme", ["ds-light", "ds-dark"])
+def test_syntax_palette_meets_wcag_aa(scheme: str) -> None:
+    css = CSS_PATH.read_text(encoding="utf-8")
+    variables = _variables(_block(css, ":root"))
+    variables.update(_variables(_block(css, f'[data-md-color-scheme="{scheme}"]')))
+    tokens = {
+        "--md-code-hl-number-color",
+        "--md-code-hl-special-color",
+        "--md-code-hl-function-color",
+        "--md-code-hl-constant-color",
+        "--md-code-hl-keyword-color",
+        "--md-code-hl-string-color",
+        "--md-code-hl-name-color",
+        "--md-code-hl-operator-color",
+        "--md-code-hl-punctuation-color",
+        "--md-code-hl-comment-color",
+        "--md-code-hl-generic-color",
+        "--md-code-hl-variable-color",
+    }
+    background = _resolve("--md-code-bg-color", variables)
+
+    for token in tokens:
+        ratio = _contrast(_resolve(token, variables), background)
+        assert ratio >= 4.5, f"{scheme} {token}: {ratio:.2f}:1"
+
+
+def test_fonts_are_self_hosted_with_licences() -> None:
+    css = CSS_PATH.read_text(encoding="utf-8")
+    config = MKDOCS_PATH.read_text(encoding="utf-8")
+    expected_fonts = {
+        "ibm-plex-sans-latin-wght-normal.woff2",
+        "ibm-plex-sans-latin-wght-italic.woff2",
+        "ibm-plex-mono-latin-400-normal.woff2",
+        "ibm-plex-mono-latin-600-normal.woff2",
+        "source-serif-4-latin-wght-normal.woff2",
+    }
+    expected_licences = {
+        "OFL-IBM-Plex-Sans.txt",
+        "OFL-IBM-Plex-Mono.txt",
+        "OFL-Source-Serif-4.txt",
+    }
+
+    assert "font: false" in config
+    assert "https://" not in css
+    for filename in expected_fonts | expected_licences:
+        path = FONT_PATH / filename
+        assert path.is_file() and path.stat().st_size > 1_000
+    for filename in expected_fonts:
+        assert filename in css
+
+
+def test_application_shell_uses_named_button_controls() -> None:
+    header = (OVERRIDES_PATH / "header.html").read_text(encoding="utf-8")
+    search = (OVERRIDES_PATH / "search.html").read_text(encoding="utf-8")
+    navigation = (OVERRIDES_PATH / "nav.html").read_text(encoding="utf-8")
+    javascript = ACCESSIBILITY_JS_PATH.read_text(encoding="utf-8")
+
+    assert '<button type="button"' in header
+    assert 'aria-controls="site-navigation"' in header
+    assert 'aria-expanded="false"' in header
+    assert 'data-ds-toggle="drawer"' in header
+    assert 'role="dialog"' in search and 'aria-labelledby="__search-title"' in search
+    assert 'id="site-navigation"' in navigation
+    assert "Escape" in javascript and "restoreFocus" in javascript
+    assert 'setAttribute("aria-expanded"' in javascript
+
+
+def test_tables_gain_a_named_keyboard_scroll_region() -> None:
+    javascript = ACCESSIBILITY_JS_PATH.read_text(encoding="utf-8")
+    css = CSS_PATH.read_text(encoding="utf-8")
+
+    assert "region.tabIndex = overflow ? 0 : -1" in javascript
+    assert 'region.setAttribute("role", "region")' in javascript
+    assert 'region.setAttribute("aria-labelledby", caption.id)' in javascript
+    assert "ResizeObserver" in javascript
+    assert ".ds-table-region" in css
+    assert "position: sticky" in css
 
 
 def test_readme_inspiration_note_is_the_final_section() -> None:

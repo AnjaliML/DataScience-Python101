@@ -9,8 +9,12 @@ def standardize_columns(matrix: np.ndarray) -> np.ndarray:
     values = np.asarray(matrix)
     if values.ndim != 2 or 0 in values.shape:
         raise ValueError("matrix must be a non-empty two-dimensional array")
-    if not np.issubdtype(values.dtype, np.number):
-        raise ValueError("matrix must contain numeric values")
+    is_numeric = np.issubdtype(values.dtype, np.number)
+    is_complex = np.issubdtype(values.dtype, np.complexfloating)
+    if not is_numeric or is_complex:
+        raise ValueError("matrix must contain real numeric values")
+    if not np.isfinite(values).all():
+        raise ValueError("matrix must contain only finite values")
 
     standard_deviations = values.std(axis=0)
     if np.any(standard_deviations == 0):

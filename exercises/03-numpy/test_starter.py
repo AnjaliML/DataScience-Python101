@@ -16,8 +16,16 @@ def test_standardises_columns_without_mutation() -> None:
 
 @pytest.mark.parametrize(
     "matrix",
-    [np.array([]), np.array([1, 2]), np.array([[1, 3], [1, 4]])],
+    [
+        np.array([]),
+        np.array([1, 2]),
+        np.array([[1, 3], [1, 4]]),
+        np.array([[1, 2], [np.nan, 3]]),
+        np.array([[1, 2], [np.inf, 3]]),
+        np.array([[1, 2], [-np.inf, 3]]),
+        np.array([[1 + 2j, 2], [3 + 4j, 5]]),
+    ],
 )
-def test_invalid_shapes_or_constant_columns_fail(matrix: np.ndarray) -> None:
+def test_invalid_matrices_fail(matrix: np.ndarray) -> None:
     with pytest.raises(ValueError):
         standardize_columns(matrix)

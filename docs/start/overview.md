@@ -57,26 +57,56 @@ Every lesson uses five moves.
 Do not treat those headings as decoration. If you cannot predict a result or
 name a failure mode, the code is doing more thinking than you are.
 
+Each lesson then links to a public practice page with the same scaffold:
+**worked warm-up → completion → transfer → Hint 1 → Hint 2 → tests or rubric →
+worked reasoning**. Start at the [practice index](../practice/index.md) if you
+want to see the whole sequence.
+
 ## Quick route
 
-Allow 9–11 focused hours. Work through these in order:
+Allow **14–18 focused hours including the practice checkpoints**. This route is
+only a shortcut through material you can already demonstrate; it is not a
+shortcut around the capstone's functions, testing, reproducibility, or
+command-line requirements.
+
+Use it if you can already create and run a small Python script, read a simple
+traceback, and explain a list, function, and Boolean condition. If not, take the
+[setup page](setup.md) as far as the Python version check, complete the
+[15-minute first-script bridge](first-script.md), and use the full route.
+
+Work through these ten lessons in order:
 
 1. [Ask an answerable question](../lessons/01-questions.md)
-2. [Python values and expressions](../lessons/02-python-basics.md)
-3. [NumPy arrays](../lessons/04-numpy.md)
-4. [pandas DataFrames](../lessons/05-pandas.md)
-5. [Clean and validate data](../lessons/06-cleaning.md)
-6. [Explore and visualise](../lessons/07-visualization.md)
-7. [Statistics and uncertainty](../lessons/08-statistics.md)
-8. [Start with a baseline](../lessons/09-modeling.md)
-9. [Evaluate honestly](../lessons/10-evaluation.md)
+2. [Functions and control flow](../lessons/03-functions-control.md)
+3. [pandas DataFrames](../lessons/05-pandas.md)
+4. [Clean and validate data](../lessons/06-cleaning.md)
+5. [Explore and visualise](../lessons/07-visualization.md)
+6. [Start with a baseline](../lessons/09-modeling.md)
+7. [Evaluate honestly](../lessons/10-evaluation.md)
+8. [Reproducible projects](../lessons/11-reproducibility.md)
+9. [Turn analysis into a tool](../lessons/12-tools.md)
+10. [Capstone](../lessons/13-capstone.md)
 
-Then complete the [capstone](../lessons/13-capstone.md). Return to the linked
-full-route lessons whenever a step feels like magic.
+The route skips lessons 02, 04, and 08 only because their ideas are checked at
+the point of use. Before skipping each one, confirm that you can:
+
+- trace names, values, types, and Boolean expressions (lesson 02);
+- state the shape and axis of an array operation (lesson 04);
+- distinguish an estimate, an uncertainty interval, and a causal claim
+  (lesson 08).
+
+If any check is unclear, take that lesson and its practice page before
+continuing. This keeps “quick” honest: the endpoint and review standard are the
+same as the full route.
 
 ## Full route
 
 Allow 28–32 hours including exercises.
+
+If this is your first time programming, follow [Set up once](setup.md) until the
+Python version command works, take
+[Your first 15 minutes with Python](first-script.md), return for the setup ready
+checks, then take lessons 01–13 and their linked practice journeys in order.
 
 | Stage | Lessons | Habit you are building |
 | --- | --- | --- |
@@ -119,14 +149,20 @@ run from a clean process.
 
 ## Assessment
 
-The capstone is a compact renewal-analysis package. It requires:
+The [capstone studio](../lessons/13-capstone.md) separates two kinds of work:
 
-- one answerable question and a declared unit of observation;
-- a validated dataset and recorded data-quality decisions;
-- descriptive evidence and one purposeful figure;
-- a simple baseline and one leakage-safe classification pipeline;
-- holdout metrics, error analysis, and stated limitations;
-- tests, a locked environment, and a one-command rebuild.
+1. **Reference audit:** reproduce the supplied renewal capsule, trace one claim
+   back to source rows and assumptions, and challenge one declared choice.
+2. **Learner-owned capstone:** ask a question the reference does not answer,
+   make at least two material analytical choices, implement small tested steps,
+   and expose one documented rebuild command.
+
+Running the finished reference command does not count as the learner capstone.
+The learner-owned project may be descriptive, inferential, or predictive; it
+needs only the methods its question requires. Every project still needs a
+declared row unit, validated data, visible evidence, an honest comparison,
+tests, limitations, a locked environment, and a reproducible output contract.
 
 The standard is not clever code or the highest score. The standard is whether
-another learner can inspect, challenge, and reproduce the reasoning.
+another learner can inspect, challenge, and reproduce **your reasoning and
+choices**.

@@ -185,6 +185,11 @@ flag = monthly_usage_hours < 5 and support_tickets >= 2 or tenure_months < 3
 
 There are at least two plausible policies hiding in it. Explain which grouping you chose and why.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/02-python-basics.md).
+You will complete a trace before expressing an independent policy.
+
 ## Keep going
 
 You can now read a short expression as a mechanism: inputs with types, an operation, and an output with a predictable value and type.

@@ -1,194 +1,215 @@
 # 01 — From a decision to a data question
 
-Data science starts before code. A useful analysis connects a real decision to a table whose rows, columns, and timing are unambiguous.
+Data science starts before code. A useful analysis connects a real decision to
+rows, fields, and timing that another person can challenge.
 
-By the end of this lesson, you will be able to write a small **question contract**: what one row represents, what must be predicted, what information is available, how success is judged, and how the work could fail.
+**No programming is required in this lesson.** The main artifact is a
+plain-language question contract. An optional code preview appears near the end
+for learners who are curious about how the same claims later become checks.
+
+By the end, you will be able to state what one row represents, what outcome is
+measured, which information is available in time, how success is judged, and
+what failure should stop the work.
 
 ## Frame
 
-Imagine a subscription team asking, “Which customers should we contact?” A computer cannot answer yet: contact them about what, at what time, based on which evidence, and with what result?
+Imagine a subscription team asking, “Which customers should we contact?” It is
+not answerable yet. Contact them about what? At what moment? Using which
+evidence? What result would make the effort useful?
 
-First name the decision: before a renewal decision, prioritise customers for a
-helpful check-in. Then ask an answerable question:
+First name the decision: **before a renewal decision, prioritise accounts for a
+helpful check-in**. Then write an answerable question:
 
-> Using pre-decision account information, which customers are at greater risk
-> of not renewing at the current decision?
+> Using account information recorded before the renewal decision, which
+> accounts are at greater risk of not renewing at that decision?
 
-Five parts make this question testable:
+Five parts make the question testable:
 
-| Part | Meaning | Renewal example |
+| Part | Plain-language meaning | Renewal example |
 | --- | --- | --- |
-| Unit of observation | What exactly one row describes | one customer at one renewal decision |
-| Target | The outcome to learn or estimate | renewed at this decision: `1` or `0` |
-| Features | Information allowed at prediction time | plan, channel, tenure, usage, support, satisfaction |
-| Success criterion | A measurable improvement tied to the decision | find more likely non-renewers than the current rule |
-| Failure modes | Ways a plausible answer could mislead | late data, leakage, duplicate customers, unequal errors |
+| Unit | What exactly one row describes | one subscription account at one renewal decision |
+| Outcome | What later event is measured | renewed: yes or no |
+| Available evidence | What is known before acting | plan, tenure, earlier usage, earlier support history |
+| Success rule | What must improve, under what constraint | find more eventual non-renewals than the current priority rule when both review 100 accounts |
+| Failure modes | What could make the answer misleading | late data, repeated accounts, missing groups, unequal error costs |
 
-The unit is not automatically “a customer.” A real customer might hold two
-subscriptions or encounter several decision dates. In this teaching table,
-`customer_id` is unique and each fictional customer contributes one row.
-
-The raw target remains `renewed`: `1` means renewed and `0` means not
-renewed. Later, evaluation treats **not renewed** as the positive class because
-that is the event the prioritisation decision tries to find.
+The unit is not automatically “a customer.” One person might have two
+subscriptions or several renewal dates. In this teaching table, each fictional
+`customer_id` represents one account at one observed renewal decision.
 
 ## Predict
 
-Before opening `data/customer_renewals.csv`, write down what you expect.
+Before opening the table, write your expectations in ordinary sentences:
 
-1. What should one row represent?
-2. Which column should contain the eventual outcome?
-3. Which columns must exist before the renewal outcome becomes known?
-4. Which values would be impossible or suspicious?
-5. Which column should uniquely identify a row?
+1. One row should represent…
+2. The later outcome should be recorded as…
+3. These fields must already exist when the decision is made…
+4. These values would be impossible or suspicious…
+5. This field, or combination of fields, should identify one row…
 
-Then predict the behavior of this small question specification before running it:
-
-```python
-question = {
-    "unit": "customer at one renewal decision",
-    "key": "customer_id",
-    "target": "renewed",
-    "target_values": {0, 1},
-    "later_positive_evaluation_class": "not renewed",
-}
-
-print(type(question))
-print(question["target"] == "renewed")
-```
-
-State both expected outputs and their types. Prediction is a habit: it makes misunderstandings visible before they become results.
+Do not look for the “right” wording yet. A prediction gives the table something
+specific to disagree with.
 
 ## Build
 
-Start with the unit of observation. Complete this sentence without using the word “data”:
+Copy this worksheet into your reasoning log:
+
+```text
+decision:
+population covered:
+one row represents:
+row key:
+decision time:
+outcome and allowed values:
+when the outcome becomes known:
+permitted evidence and its cutoff:
+baseline:
+success rule and capacity:
+cost of a false alarm:
+cost of a missed case:
+failure that would stop the analysis:
+```
+
+### 1. Make the row visible
+
+Complete this sentence without using the word “data”:
 
 > Each row represents ______ observed at ______.
 
-“One customer at one renewal decision” tells us what must be unique and when
-features must be frozen. In this table, `customer_id` should not repeat. A
-future event table might instead need a compound key such as
-`(customer_id, decision_date)`.
+For this course: “Each row represents one subscription account observed at one
+renewal decision.” That statement implies a key and a clock. In a table with
+many decisions per account, the key might need both account ID and decision
+date.
 
-Next define the target as an observable rule, not a vague business word:
+### 2. Define an observable outcome
 
-```python
-target_rule = {
-    "name": "renewed",
-    "one_when": "the customer renewed at the observed decision",
-    "zero_when": "the customer did not renew",
-    "known_after": "the renewal decision",
-}
-```
+Avoid a vague label such as “loyal”. State what event counts, its allowed
+outcomes, and when it becomes known:
 
-A good target rule says which event counts, what time window applies, and when the answer becomes known. “Customer loyalty” does none of these.
+| Question | Renewal contract |
+| --- | --- |
+| What is measured? | whether the account renewed at this decision |
+| Which outcomes are allowed? | renewed or did not renew |
+| When is the answer known? | after the renewal decision |
 
-Now divide possible columns by time:
+Later lessons store those outcomes as `1` and `0`, but the words come first.
 
-```python
-feature_timing = {
-    "tenure_months": "available",
-    "plan": "available",
-    "monthly_usage_hours": "available",
-    "support_tickets": "available",
-    "satisfaction_score": "available when the survey was answered",
-    "renewal_confirmation_sent": "future outcome",
-}
-```
+### 3. Draw the time boundary
 
-Only features available at the decision moment may be used. A future payment date would reveal the answer. That is **target leakage**: excellent-looking performance produced by information the real decision cannot have.
+Classify possible evidence as **available**, **too late**, or **uncertain**:
 
-Write a success criterion with a baseline and a constraint:
+| Field | Classification | Reason |
+| --- | --- | --- |
+| plan recorded before the decision | available | exists when prioritisation happens |
+| earlier monthly usage | available | measured before the cutoff |
+| cancellation reason | too late | created because non-renewal happened |
+| renewal confirmation | too late | directly reveals the outcome |
+| survey without a timestamp | uncertain | availability cannot be verified |
 
-```python
-success = {
-    "baseline": "predict the most common outcome",
-    "primary_measure": "non-renewers found among prioritised customers",
-    "constraint": "review a fixed number of customers per week",
-}
-```
+Using information created with or after the outcome is **target leakage**. It
+can make a model look excellent while making the real decision impossible.
 
-This is more useful than “achieve high accuracy.” If 90% of customers renew, always predicting renewal is 90% accurate and finds no one who needs help.
+### 4. Make “better” measurable
 
-Finally, list failure modes before analysis. Include at least one from each group:
+“Achieve high accuracy” is not enough. If most accounts renew, always saying
+“renew” can have high accuracy while finding none of the accounts the team
+wants to review. It is also not a capacity-matched ranking baseline: it does
+not say which 100 accounts should be contacted.
 
-- **Definition:** renewals and later reactivations are mixed together.
-- **Timing:** a feature was updated after the renewal decision.
-- **Structure:** duplicate rows make some customers count twice.
-- **Coverage:** new customers or a sales channel are missing.
-- **Decision cost:** too many people are flagged for the team to contact.
-- **Human impact:** errors are concentrated in a particular customer group.
+A stronger success rule names:
+
+- a capacity-matched baseline, such as the current priority rule or a seeded
+  random selection of the same 100 accounts;
+- a scarce resource, such as 100 reviews per week;
+- the useful event, such as eventual non-renewals found;
+- error consequences for unnecessary contacts and missed accounts.
+
+### 5. Name failure before analysis
+
+Include at least one threat from each group:
+
+- **Definition:** later reactivations are mixed with on-time renewals.
+- **Timing:** a field was updated after the decision.
+- **Structure:** repeated rows give some accounts extra weight.
+- **Coverage:** a channel or newly arrived account group is absent.
+- **Decision cost:** the rule flags more accounts than the team can review.
+- **Human impact:** errors concentrate in a particular group.
 
 ## Check
 
-Use questions as checks, not as decoration.
+Challenge the contract without writing code:
 
-```python
-required_parts = {
-    "unit",
-    "key",
-    "target",
-    "target_values",
-    "later_positive_evaluation_class",
-}
+- If one account appears twice, does the proposed key expose it?
+- If only dissatisfied people answer the survey, what population does that
+  score describe?
+- If a field has no timestamp, can its pre-decision status be defended?
+- If 90% of rows share one outcome, what does the baseline achieve?
+- If the team can review only 100 cases, can the success rule be acted on?
+- Which failure would make you stop rather than simply add a caveat?
 
-assert required_parts.issubset(question)
-assert question["target_values"] == {0, 1}
-assert question["key"] != question["target"]
-```
-
-Before running, predict whether each assertion passes. If an assertion fails, Python is telling you which assumption is not encoded as expected; it is not proving the business definition is correct.
-
-When you later inspect the table, check claims implied by the contract:
-
-```python
-# These checks become possible after the dataset is loaded as `customers`.
-assert customers["customer_id"].notna().all()
-assert customers["customer_id"].is_unique
-assert customers["renewed"].isin([0, 1]).all()
-assert customers["tenure_months"].between(1, 48).all()
-```
-
-Predict the result of every check first. A failed uniqueness check may mean bad data, or it may mean your proposed unit was wrong.
+Ask another learner to read only your contract. If they cannot answer “who,
+when, what outcome, compared with what, and where the claim stops,” revise it.
 
 ## Explain
 
-A dataset does not contain a question by itself. People choose the rows, labels, time windows, and measures. Those choices determine what an analysis can honestly claim.
+A dataset does not contain a question by itself. People choose the rows,
+labels, windows, and measures; those choices determine what the analysis can
+honestly claim.
 
 The mechanism is:
 
-1. A decision fixes **who or what** can receive an action.
-2. Its timing fixes **when** information must be available.
-3. The desired consequence fixes a measurable **target**.
-4. Capacity and error costs fix the **success criterion**.
-5. Assumptions imply **checks** and predictable failure modes.
+1. A decision fixes who or what can receive an action.
+2. Its timing fixes which information is available.
+3. The desired consequence fixes an observable outcome.
+4. Capacity and error costs fix the success rule.
+5. Assumptions imply checks and predictable failure modes.
 
-Notice that prediction quality and decision quality are related but different. A model may estimate renewal accurately while the reminder has no effect. Prediction asks what is likely; an intervention question asks what will change because we act.
+Prediction and intervention remain different. Estimating who may not renew
+does not show that contacting them will change renewal. That causal question
+requires evidence about what happens because of the action.
+
+??? note "Optional code preview — safe to skip"
+    Later, the plain-language contract can become a small Python dictionary:
+
+    ```python
+    question = {
+        "unit": "account at one renewal decision",
+        "key": "customer_id",
+        "target": "renewed",
+        "target_values": {0, 1},
+        "positive_evaluation_class": "not renewed",
+    }
+    ```
+
+    Checks can then ask whether the structure matches the stated contract:
+
+    ```python
+    required = {"unit", "key", "target", "target_values"}
+    assert required.issubset(question)
+    assert question["target_values"] == {0, 1}
+    assert question["key"] != question["target"]
+    ```
+
+    These checks confirm that the specification has the expected pieces. They
+    cannot prove that the business definition, timing, or human impact is right.
 
 ## Practice
 
-Choose one decision: send a reminder, review an application, restock an item, or schedule support. Write a question contract with all five parts.
+Revise one weak request—“Why do customers leave?”, “Can we predict sales?”, or
+“Which users are valuable?”—using the worksheet. Specify unit, outcome,
+decision time, evidence cutoff, baseline, capacity, error costs, and a stop
+rule.
 
-Then revise these weak questions:
+## Guided practice journey
 
-1. “Why do customers leave?”
-2. “Can we predict sales?”
-3. “Which users are valuable?”
-
-For each revision, specify a unit, target, decision time, feature cutoff, and success criterion.
-
-For the renewal scenario, decide whether each item is a valid feature and explain why:
-
-- current plan recorded before the decision
-- monthly usage measured before the decision
-- a cancellation reason entered after non-renewal
-- renewal confirmation status
-- support tickets recorded before the decision
-
-Finally, invent two checks that could disprove your assumptions. Strong checks have a clear expected result, such as a unique key or an allowed set of target values.
+[Work through Try → Hint 1 → Hint 2 → rubric → worked reasoning](../practice/01-questions.md).
+It starts in plain language and then transfers the contract to a new decision.
 
 ## Keep going
 
-Keep your question contract beside the analysis and update it when definitions change. In the next lesson, you will encode small, readable claims with Python names, values, types, and expressions.
+Before moving on, you should be able to state what one row represents, when the
+decision happens, when its outcome becomes known, which information is
+permitted, what would beat the baseline, and which failure would make you stop.
 
-Before moving on, you should be able to state what one row represents, when prediction happens, when its outcome becomes known, which information is permitted, what would beat the baseline, and which failure would make you stop rather than publish.
+Next, [lesson 02](02-python-basics.md) turns small claims into Python names,
+values, types, and expressions.

@@ -24,9 +24,11 @@ the input.
 
 ## Check
 
-Add a row whose ID appears three times. Decide whether your duplicate count is
-counting duplicate values after the first or all implicated rows, then make the
-test and docstring agree.
+Add a fixture in which one customer ID appears three times and another appears
+once. Confirm that `duplicate_customer_ids` is `3`: count **all rows implicated
+in a duplicate ID**, including the first occurrence. This is the behavior of
+`customers["customer_id"].duplicated(keep=False).sum()`; do not count only
+occurrences after the first or only the number of distinct duplicated IDs.
 
 ## Explain
 

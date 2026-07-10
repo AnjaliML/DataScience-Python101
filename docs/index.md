@@ -57,17 +57,17 @@ check it aggressively, and explain the boundary of the result.
 
 <div class="route-grid">
   <article class="route-card">
-    <p class="route-time">8–10 focused hours</p>
+    <p class="route-time">14–18 focused hours</p>
     <h3>Quick route</h3>
-    <p>For learners who already write small scripts and need a trustworthy
-    data-science workflow.</p>
-    <p><a href="start/overview/#quick-route">See the seven-lesson route →</a></p>
+    <p>For learners who can already trace a small script and want the shortest
+    route that still teaches every capstone prerequisite.</p>
+    <p><a href="start/overview/#quick-route">See the ten-lesson route →</a></p>
   </article>
   <article class="route-card route-card-accent">
     <p class="route-time">28–32 hours with practice</p>
     <h3>Full route</h3>
-    <p>For beginners who want Python foundations, data work, modelling, and
-    reproducibility in one continuous path.</p>
+    <p>For beginners who want a first-script bridge, Python foundations, data
+    work, modelling, and reproducibility in one continuous path.</p>
     <p><a href="start/overview/#full-route">See the complete route →</a></p>
   </article>
 </div>
