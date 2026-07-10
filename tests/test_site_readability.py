@@ -121,8 +121,10 @@ def test_palette_text_meets_wcag_aa(
 @pytest.mark.parametrize(
     ("scheme", "foreground", "background", "minimum"),
     [
-        ("ds-light", "--ds-copy", "--md-code-bg-color--lighter", 4.5),
-        ("ds-dark", "--ds-copy", "--md-code-bg-color--lighter", 4.5),
+        ("ds-light", "--ds-copy", "--ds-copy-bg", 4.5),
+        ("ds-dark", "--ds-copy", "--ds-copy-bg", 4.5),
+        ("ds-light", "--ds-gridline", "--md-code-bg-color", 3.0),
+        ("ds-dark", "--ds-gridline", "--md-code-bg-color", 3.0),
         ("ds-light", "--ds-gridline", "--md-default-bg-color", 3.0),
         ("ds-dark", "--ds-gridline", "--md-default-bg-color", 3.0),
     ],

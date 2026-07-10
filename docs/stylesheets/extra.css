@@ -56,7 +56,8 @@
   --ds-teal: #0f766e;
   --ds-coral: #b84232;
   --ds-focus: #c04739;
-  --ds-copy: #45546d;
+  --ds-copy: #33415c;
+  --ds-copy-bg: #ffffff;
   --ds-gridline: #7c899d;
   --ds-table-cell: #ffffff;
   --ds-hero-mark: rgba(36, 87, 214, 0.18);
@@ -164,7 +165,8 @@
   --ds-teal: #5eead4;
   --ds-coral: #fb8f80;
   --ds-focus: #fb8f80;
-  --ds-copy: #b4bfd0;
+  --ds-copy: #dbe3ee;
+  --ds-copy-bg: #24314b;
   --ds-gridline: #617290;
   --ds-table-cell: #172136;
   --ds-hero-mark: rgba(94, 234, 212, 0.18);
@@ -222,9 +224,9 @@ pre {
 }
 
 .md-typeset h1 {
-  max-width: 22ch;
-  font-size: clamp(2.1rem, 5vw, 3.7rem);
-  line-height: 1.04;
+  max-width: 26ch;
+  font-size: clamp(1.85rem, 3.2vw, 2.45rem);
+  line-height: 1.12;
 }
 
 .md-typeset h2 {
@@ -274,17 +276,26 @@ pre {
   outline-offset: 3px;
 }
 
-.md-clipboard,
-:hover > .md-clipboard {
-  border-radius: 0.3rem;
-  background: var(--md-code-bg-color--lighter);
-  color: var(--ds-copy) !important;
-  opacity: 1;
+/* Material rests the code-block copy button at --md-default-fg-color--lightest and
+   only darkens it once the block is hovered, which leaves it invisible against the
+   chip behind it. The hover-scoped selectors are repeated so the resting state wins. */
+.md-code__nav,
+:hover > .md-code__nav {
+  border: 1px solid var(--ds-gridline);
+  border-radius: 0.25rem;
+  background-color: var(--ds-copy-bg);
+  transition: background-color 250ms, border-color 250ms;
 }
 
-.md-clipboard:hover,
-.md-clipboard:focus-visible {
-  color: var(--md-accent-fg-color) !important;
+.md-code__button,
+:hover > * > .md-code__button {
+  color: var(--ds-copy);
+}
+
+.md-code__button:hover,
+.md-code__button:focus-visible,
+.md-code__button.focus-visible {
+  color: var(--md-accent-fg-color);
 }
 
 .md-search__suggest,
@@ -424,9 +435,10 @@ pre {
 .course-hero h1 {
   position: relative;
   z-index: 1;
-  max-width: 13ch;
+  max-width: 15ch;
   margin: 0.15em 0 0.35em;
-  font-size: clamp(2.6rem, 7vw, 5.5rem);
+  font-size: clamp(2.25rem, 4.6vw, 3.4rem);
+  line-height: 1.08;
 }
 
 .eyebrow,
@@ -472,19 +484,44 @@ pre {
   box-shadow: 0 8px 20px rgba(20, 33, 61, 0.14);
 }
 
-.md-typeset .button-primary {
+/* Material's `.md-typeset a:hover` recolours links to the accent, which is the
+   same blue as these buttons' own fill. Each state is pinned explicitly so the
+   label never lands on a background of its own colour. */
+.md-typeset .button-primary,
+.md-typeset .button-primary:hover,
+.md-typeset .button-primary:focus,
+.md-typeset .button-primary:focus-visible {
   border-color: var(--ds-blue);
   background: var(--ds-blue);
   color: #fff;
 }
 
-[data-md-color-scheme="ds-dark"] .md-typeset .button-primary {
+.md-typeset .button-primary:hover,
+.md-typeset .button-primary:focus,
+.md-typeset .button-primary:focus-visible {
+  border-color: var(--ds-blue-dark);
+  background: var(--ds-blue-dark);
+}
+
+[data-md-color-scheme="ds-dark"] .md-typeset .button-primary,
+[data-md-color-scheme="ds-dark"] .md-typeset .button-primary:hover,
+[data-md-color-scheme="ds-dark"] .md-typeset .button-primary:focus,
+[data-md-color-scheme="ds-dark"] .md-typeset .button-primary:focus-visible {
   color: #101728;
 }
 
-.md-typeset .button-secondary {
+.md-typeset .button-secondary,
+.md-typeset .button-secondary:hover,
+.md-typeset .button-secondary:focus,
+.md-typeset .button-secondary:focus-visible {
   background: var(--ds-panel);
   color: var(--ds-blue-dark);
+}
+
+.md-typeset .button-secondary:hover,
+.md-typeset .button-secondary:focus,
+.md-typeset .button-secondary:focus-visible {
+  border-color: var(--ds-blue);
 }
 
 .course-loop {
