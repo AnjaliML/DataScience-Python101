@@ -191,6 +191,7 @@ const chrome = spawn(
   ],
   { stdio: ["ignore", "ignore", "pipe"] },
 );
+const chromeExited = new Promise((resolveExit) => chrome.once("exit", resolveExit));
 
 let cdp;
 try {
@@ -260,7 +261,17 @@ try {
   console.log("Mobile search keyboard focus regression passed");
 } finally {
   cdp?.close();
-  chrome.kill("SIGTERM");
+  if (chrome.exitCode === null) chrome.kill("SIGTERM");
+  await Promise.race([chromeExited, delay(5_000)]);
+  if (chrome.exitCode === null) {
+    chrome.kill("SIGKILL");
+    await chromeExited;
+  }
   await new Promise((resolveClose) => server.close(resolveClose));
-  await rm(userDataDirectory, { force: true, recursive: true });
+  await rm(userDataDirectory, {
+    force: true,
+    maxRetries: 10,
+    recursive: true,
+    retryDelay: 100,
+  });
 }
