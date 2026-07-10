@@ -8,11 +8,6 @@
 Learn enough Python to make a trustworthy data-science claim—not merely to
 make a notebook run.
 
-> This guide was inspired by
-> [CoMPhy Python 101](https://github.com/comphy-lab/comphy-python101) by Vatsal
-> Sanjay and CoMPhy Lab contributors. It is an original data-science-focused
-> rewrite with the CFD, Basilisk, and physics-specific material removed.
-
 ## The course spine
 
 ```text
@@ -85,3 +80,10 @@ tests/                Unit and end-to-end checks
 ## License
 
 The guide, examples, and code are available under the [MIT License](LICENSE).
+
+## Inspiration
+
+> This guide was inspired by
+> [CoMPhy Python 101](https://github.com/comphy-lab/comphy-python101) by Vatsal
+> Sanjay and CoMPhy Lab contributors. It is an original data-science-focused
+> rewrite with the CFD, Basilisk, and physics-specific material removed.
