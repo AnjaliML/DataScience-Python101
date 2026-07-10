@@ -173,6 +173,11 @@ An index is useful for alignment, but accidental alignment is dangerous. A custo
 
 Before each operation, predict the output unit, row count, and columns. Then write an assertion that could fail.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/05-pandas.md).
+The journey completes a plan summary, then transfers the grain checks to a merge.
+
 ## Keep going
 
 Before moving on, explain why one bracket returns a Series, why `.loc` aids review, what a row means after `groupby`, why merges need cardinality checks, and why an index must not silently become customer identity.

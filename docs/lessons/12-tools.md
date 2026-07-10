@@ -176,3 +176,8 @@ record checksums for traceability.
 1. Add a `--minimum-tenure` argument and keep its filter in a function.
 2. Make a missing input return code `2` with a useful message.
 3. Fail on an unknown target, then rerun from elsewhere with absolute paths.
+
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/12-tools.md).
+You will complete a safe command before adding one independently tested option.

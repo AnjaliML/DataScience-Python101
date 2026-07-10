@@ -14,6 +14,17 @@ Do the setup carefully once; then use the same commands throughout the course.
 The recommended environment manager is `uv`, but a standard Python virtual
 environment also works.
 
+??? info "If terminals, Git, and environments are all new"
+    Setup is scaffolding, not a test of prior knowledge. Copy one command at a
+    time and compare its output with this page. You do not need to understand
+    Git history, package resolution, pytest, or MkDocs yet.
+
+    Your first meaningful checkpoint is simply that Python starts. Once
+    `uv run python --version` works (or `python --version` inside the standard
+    environment), pause setup and take
+    [Your first 15 minutes with Python](first-script.md). Then return here for
+    the project checks.
+
 ## Get the course
 
 ```bash
@@ -51,6 +62,11 @@ uv run mkdocs build --strict
 
 The last two commands should pass before you change any exercise code. That
 gives you a known-good starting point.
+
+If this is your first program, take the
+[first-script and traceback bridge](first-script.md) after the version command,
+then return to run pytest and the documentation build. Those project tools make
+more sense once you have seen a script run and fail once.
 
 ## Standard virtual-environment setup
 
@@ -162,4 +178,6 @@ You are ready when all of these are true:
 
 With an activated standard virtual environment, omit the `uv run` prefix.
 
-Next: [learn how to use prediction and checks](how-to-learn.md).
+If running a Python file or reading a traceback is new to you, take the
+[15-minute first-script bridge](first-script.md) next. Otherwise continue to
+[prediction and checks](how-to-learn.md).

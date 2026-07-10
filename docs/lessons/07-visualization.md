@@ -37,10 +37,14 @@ Load the table and create one numeric outcome:
 
 ~~~python
 from pathlib import Path
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-customers = pd.read_csv("data/customer_renewals.csv")
+customers = pd.read_csv("data/customer_renewals.csv").sort_values(
+    "customer_id", kind="stable"
+)
 customers["renewed_num"] = pd.to_numeric(customers["renewed"], errors="coerce")
 assert customers["renewed_num"].notna().all()
 assert customers["renewed_num"].isin([0, 1]).all()
@@ -49,13 +53,31 @@ assert customers["renewed_num"].isin([0, 1]).all()
 Set stable visual defaults and one save function:
 
 ~~~python
-plt.rcParams.update({"axes.spines.top": False, "axes.spines.right": False})
+BLUE = "#0072B2"
+VERMILLION = "#D55E00"
+INK = "#172033"
+GRID = "#CCD3DD"
+plt.rcParams.update({
+    "font.family": "DejaVu Sans",
+    "font.size": 11,
+    "axes.titlesize": 14,
+    "axes.titleweight": "bold",
+    "axes.labelcolor": INK,
+    "axes.edgecolor": INK,
+    "xtick.color": INK,
+    "ytick.color": INK,
+    "text.color": INK,
+    "figure.facecolor": "white",
+    "axes.facecolor": "white",
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+})
 FIGURE_DIR = Path("docs/assets/figures")
 def save_figure(fig, filename):
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(FIGURE_DIR / filename, dpi=160, facecolor="white",
                 bbox_inches="tight",
-                metadata={"Creator": "Data Science Python 101"})
+                metadata={"Creator": "Data Science Python 101", "Date": None})
     plt.close(fig)
 ~~~
 
@@ -66,18 +88,37 @@ Fixed inputs, dimensions, bins, ordering, and library versions make figures repe
 Inspect counts before plotting:
 
 ~~~python
-usage = customers["monthly_usage_hours"].dropna()
+usage_all = customers["monthly_usage_hours"]
+missing_usage = int(usage_all.isna().sum())
+usage = usage_all.dropna()
 assert not usage.empty
 upper = max(5.0, float(np.ceil(usage.max() / 5) * 5))
 bins = np.arange(0, upper + 5, 5)
-fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
-ax.hist(usage, bins=bins, color="#0072B2", edgecolor="white")
+fig, ax = plt.subplots(figsize=(7.2, 4.4), layout="constrained")
+ax.hist(usage, bins=bins, color=BLUE, edgecolor="white", linewidth=1)
 ax.set(title="Distribution of monthly usage", xlabel="Monthly usage (hours)",
        ylabel="Customers", xlim=(0, upper))
+ax.grid(axis="y", color=GRID, linewidth=0.8, alpha=0.7)
+ax.set_axisbelow(True)
+ax.text(0.99, 0.96, f"n={len(usage)} observed · missing={missing_usage}",
+        transform=ax.transAxes, ha="right", va="top", fontsize=10, color=INK,
+        bbox={"facecolor": "white", "edgecolor": GRID, "pad": 4})
+print({"observed_rows": len(usage), "missing_rows": missing_usage})
 save_figure(fig, "monthly-usage-distribution.png")
 ~~~
 
-Explicit bins make comparisons stable. Starting at zero is sensible because negative usage is impossible. Report how many missing values the chart excluded.
+```text title="Output from the course data"
+{'observed_rows': 240, 'missing_rows': 0}
+```
+
+![Histogram of monthly usage for 240 customers. Five-hour bins begin at zero; most customers fall between 10 and 30 hours, with progressively fewer above 30 hours. The chart reports zero missing usage values.](../assets/figures/monthly-usage-distribution.png)
+
+*The distribution view uses explicit five-hour bins from zero to 45 hours.
+All 240 customer rows are shown and none are excluded for missing usage.*
+
+Explicit bins make comparisons stable. Starting at zero is sensible because
+negative usage is impossible. The count and missingness note keeps the plotted
+subset visible.
 
 ### Relationship
 
@@ -86,22 +127,36 @@ Encode renewal with both colour and marker style:
 ~~~python
 relationship = customers.dropna(
     subset=["tenure_months", "monthly_usage_hours", "renewed_num"]
-).assign(
-    renewal=lambda x: x["renewed_num"].map({0.0: "No", 1.0: "Yes"})
 ).sort_values("customer_id", kind="stable")
-fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
-for label, marker, colour in [("No", "o", "#D55E00"),
-                              ("Yes", "^", "#0072B2")]:
-    group = relationship.loc[relationship["renewal"].eq(label)]
+fig, ax = plt.subplots(figsize=(7.2, 4.4), layout="constrained")
+styles = [
+    (0, "Did not renew", "o", VERMILLION),
+    (1, "Renewed", "^", BLUE),
+]
+for value, label, marker, colour in styles:
+    group = relationship.loc[relationship["renewed_num"].eq(value)]
     ax.scatter(group["tenure_months"], group["monthly_usage_hours"],
-               label=label, marker=marker, color=colour, alpha=0.7)
-ax.legend(title="Renewed")
-ax.set(title="Usage and tenure among observed customers",
-       xlabel="Tenure (months)", ylabel="Monthly usage (hours)")
+               label=f"{label} (n={len(group)})", marker=marker,
+               color=colour, alpha=0.72, s=38, linewidths=0)
+ax.set(title="Tenure and monthly usage at customer grain",
+       xlabel="Tenure (months)", ylabel="Monthly usage (hours)",
+       xlim=(0, 50), ylim=(0, 45))
+ax.grid(color=GRID, linewidth=0.7, alpha=0.55)
+ax.set_axisbelow(True)
+ax.legend(title="Observed outcome", frameon=True,
+          facecolor="white", edgecolor=GRID)
 save_figure(fig, "usage-by-tenure.png")
 ~~~
 
-Transparency reveals dense regions. Redundant marker shapes help when colour is unavailable. The title says “among observed customers” because a scatter plot does not show a causal effect.
+![Scatter plot of 240 customers with tenure in months on the horizontal axis and monthly usage hours on the vertical axis. Orange circles are 143 non-renewers and blue triangles are 97 renewers. Renewers are more common at higher tenure and usage, but the two outcomes overlap substantially.](../assets/figures/usage-by-tenure.png)
+
+*Each mark is one customer record. All 240 rows are plotted. Outcome uses both
+the colour-safe blue/orange palette and triangle/circle shape, so colour is not
+the only distinction.*
+
+Transparency reveals dense regions and redundant marker shapes help when colour
+is unavailable. The pattern is an observed relationship, not evidence that
+increasing tenure or usage would cause renewal.
 
 ### Groups
 
@@ -113,27 +168,43 @@ plan_summary = customers.groupby(
 ).agg(
     renewal_rate=("renewed_num", "mean"),
     customers=("customer_id", "nunique"),
-).sort_values("renewal_rate", ascending=False, kind="stable")
-fig, ax = plt.subplots(figsize=(7, 4), constrained_layout=True)
-bars = ax.bar(
-    plan_summary["plan"].astype("string"), plan_summary["renewal_rate"],
-    color="#0072B2"
-)
-ax.set(title="Observed renewal rate by plan", xlabel="Plan",
-       ylabel="Renewal rate", ylim=(0, 1))
+).sort_values(["renewal_rate", "plan"], kind="stable")
+print(plan_summary.to_string(index=False))
+fig, ax = plt.subplots(figsize=(7.2, 4.4), layout="constrained")
+bars = ax.barh(plan_summary["plan"].astype("string"),
+               plan_summary["renewal_rate"], color=BLUE)
+ax.set(title="Observed renewal rate by plan", xlabel="Renewal rate",
+       ylabel="Plan", xlim=(0, 1))
+tick_values = np.linspace(0, 1, 6)
+ax.set_xticks(tick_values, labels=[f"{value:.0%}" for value in tick_values])
+ax.grid(axis="x", color=GRID, linewidth=0.8, alpha=0.7)
+ax.set_axisbelow(True)
 ax.bar_label(
     bars,
     labels=[
-        f"{rate:.0%}\n(n={count})"
+        f"{rate:.0%} · n={count}"
         for rate, count in zip(plan_summary["renewal_rate"],
                                plan_summary["customers"])
     ],
-    padding=3
+    padding=5, color=INK, fontsize=10
 )
 save_figure(fig, "renewal-rate-by-plan.png")
 ~~~
 
-The zero baseline makes bar length honest. Counts prevent a tiny group with an extreme rate from looking as certain as a large group.
+| Plan | Unique customers | Observed renewal rate |
+| --- | ---: | ---: |
+| basic | 120 | 35.0% |
+| plus | 76 | 38.2% |
+| pro | 44 | 59.1% |
+
+![Horizontal bar chart of observed renewal rate by plan on a zero-to-100-percent axis. Basic is 35 percent for 120 customers, plus is 38 percent for 76 customers, and pro is 59 percent for 44 customers.](../assets/figures/renewal-rate-by-plan.png)
+
+*The pro group has the highest observed renewal rate and the smallest group
+size. This is an association in synthetic records; it does not show that
+changing a customer's plan would change renewal.*
+
+The zero baseline makes bar length honest. Unique-customer counts prevent a
+smaller group with an extreme rate from looking as certain as a larger group.
 
 ## Check
 
@@ -170,6 +241,12 @@ For example: “Renewal rate is higher in plan A than plan B in this file. Plan 
 5. Write alt text that states the chart type, axes, main pattern, and important exception.
 
 For each figure, save a deterministic file and write the summary table that produced it.
+
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → rubric → worked reasoning](../practice/07-visualization.md).
+You will repair a rate comparison before designing a distribution comparison
+with visible observations.
 
 ## Keep going
 

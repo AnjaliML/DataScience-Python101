@@ -174,6 +174,11 @@ effect of changing a customer’s plan, usage, or support experience.
 3. Add a future-derived feature, explain why it leaks the target, then remove it.
 4. Test an unknown plan in `X_test` and a missing numeric value.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/09-modeling.md).
+The completion task isolates the target and baseline; transfer builds a split-first pipeline.
+
 ## Keep going
 
 You now have a baseline and fitted pipeline, not a finished result. Next, ask

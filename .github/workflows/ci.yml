@@ -42,3 +42,11 @@ jobs:
 
       - name: Build course website
         run: uv run mkdocs build --strict
+
+      - name: Set up Node for browser regression
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+
+      - name: Test mobile search keyboard flow
+        run: node tests/browser/mobile-search.mjs

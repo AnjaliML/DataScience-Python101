@@ -1,0 +1,41 @@
+{# A named dialog with genuine button controls; Material still owns results. #}
+<div class="md-search" data-md-component="search" role="dialog" aria-labelledby="__search-title" aria-modal="false" aria-hidden="false" id="__search-dialog">
+  <h2 class="ds-visually-hidden" id="__search-title">Search this course</h2>
+  <label class="md-search__overlay" for="__search" aria-hidden="true"></label>
+  <div class="md-search__inner" role="search" aria-label="Search this course">
+    <form class="md-search__form" name="search">
+      <input type="search" class="md-search__input" name="query" aria-label="{{ lang.t('search.placeholder') }}" placeholder="{{ lang.t('search.placeholder') }}" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" enterkeyhint="search" data-md-component="search-query" required>
+      <button type="button" class="md-search__icon md-icon ds-icon-button ds-search-close" aria-label="Close search" aria-controls="__search-dialog" data-ds-toggle="search">
+        {% set icon = config.theme.icon.search or "material/magnify" %}
+        {% include ".icons/" ~ icon ~ ".svg" %}
+        {% set icon = config.theme.icon.previous or "material/arrow-left" %}
+        {% include ".icons/" ~ icon ~ ".svg" %}
+      </button>
+      <nav class="md-search__options" aria-label="{{ lang.t('search') }}">
+        {% if "search.share" in features %}
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="{{ lang.t('search.share') }}" aria-label="{{ lang.t('search.share') }}" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            {% set icon = config.theme.icon.share or "material/share-variant" %}
+            {% include ".icons/" ~ icon ~ ".svg" %}
+          </a>
+        {% endif %}
+        <button type="reset" class="md-search__icon md-icon" title="{{ lang.t('search.reset') }}" aria-label="{{ lang.t('search.reset') }}" tabindex="-1">
+          {% set icon = config.theme.icon.close or "material/close" %}
+          {% include ".icons/" ~ icon ~ ".svg" %}
+        </button>
+      </nav>
+      {% if "search.suggest" in features %}
+        <div class="md-search__suggest" data-md-component="search-suggest" aria-hidden="true"></div>
+      {% endif %}
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta" aria-live="polite" aria-atomic="true">
+            {{ lang.t("search.result.initializer") }}
+          </div>
+          <ol class="md-search-result__list" aria-label="Search results"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

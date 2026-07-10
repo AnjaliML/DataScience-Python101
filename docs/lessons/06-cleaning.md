@@ -180,6 +180,11 @@ Passing validation means “fits this contract,” not “unbiased” or “true
 
 In an in-memory copy, set tenure to `-1`, satisfaction to `11`, renewal to `"maybe"`, and repeat an identifier with a different plan. Confirm which check catches each problem. Then propose separate policies for missing usage, satisfaction, and renewal; state why each is defensible and how many rows it affects.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/06-cleaning.md).
+You will first measure five failures, then defend task-specific repair policies.
+
 ## Keep going
 
 Before moving on, explain why raw and cleaned data need different paths, why coercion needs a failure count, why duplicate keys cannot be solved by habit, which missing values the boundary permits, and which provenance would reproduce the result.

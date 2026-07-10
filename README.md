@@ -26,11 +26,13 @@ Every lesson repeats five habits:
 
 | Route | Time | Best for |
 | --- | ---: | --- |
-| Quick route | 8–10 hours | Learners who already write a little Python |
+| Quick route | 14–18 hours | Learners who can already trace a small Python script |
 | Full route | 28–32 hours | Beginners who want a complete foundation |
 
-Both routes use the same lessons and exercises, so examples and fixes cannot
-drift between separate versions.
+Both routes draw from the same lessons and practice system. The quick route
+skips lessons 02, 04, and 08 only when the learner can already demonstrate
+their prerequisite skills, so examples and fixes cannot drift between separate
+versions.
 
 ## What you will build
 

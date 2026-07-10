@@ -136,7 +136,13 @@ and methods sections.
 
 ## Use worked solutions well
 
-Attempt the exercise before opening its solution. Then compare in this order:
+Every lesson ends with a published
+[practice journey](../practice/index.md): worked warm-up → Try → Hint 1 → Hint
+2 → tests or rubric → worked reasoning. You never need to discover an unlisted
+solution folder to know what comes next.
+
+Attempt the completion and transfer problems before opening worked reasoning.
+Then compare in this order:
 
 1. input and output contract;
 2. invalid-input policy;
@@ -147,4 +153,5 @@ Attempt the exercise before opening its solution. Then compare in this order:
 A different implementation is not automatically wrong. Prefer the version
 whose behaviour is easier to state, test, and review.
 
-Next: [ask an answerable question](../lessons/01-questions.md).
+Next: [ask an answerable question](../lessons/01-questions.md), then use its
+[guided practice journey](../practice/01-questions.md).

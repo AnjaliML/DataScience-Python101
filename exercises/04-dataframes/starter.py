@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def summarise_plans(customers: pd.DataFrame) -> pd.DataFrame:
-    """Return customer counts and observed renewal rates by plan."""
+    """Return unique-customer counts and observed renewal rates by plan."""
 
-    # TODO: validate the two columns, aggregate, sort, and reset the index.
+    # TODO: validate the row grain and three columns, then aggregate and sort.
     raise NotImplementedError

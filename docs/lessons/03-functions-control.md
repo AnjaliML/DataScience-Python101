@@ -177,6 +177,11 @@ Test one valid record and every failure boundary. Use a loop to collect valid re
 
 Finally, extend `nonrenewal_risk_band` with one new rule. Add a boundary test that would fail if your branch order were wrong.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → tests → worked reasoning](../practice/03-functions-control.md).
+The completion task uses the repository starter; transfer work goes in a new file.
+
 ## Keep going
 
 You now have a repeatable pattern: define a contract, predict behavior, implement a small function, and challenge it with tests.

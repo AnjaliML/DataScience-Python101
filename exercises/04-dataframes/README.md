@@ -14,17 +14,21 @@ type of `renewal_rate`.
 
 Implement `summarise_plans`. It must:
 
-- require `plan` and `renewed` columns;
-- require binary, non-missing outcomes;
+- require `customer_id`, `plan`, and `renewed` columns;
+- require non-missing identifiers and plans, plus binary, non-missing outcomes;
+- require one row per customer by rejecting duplicate `customer_id` values;
 - return one row per observed plan;
-- return columns `plan`, `customers`, and `renewal_rate`;
+- return columns `plan`, `customers`, and `renewal_rate`, where `customers`
+  counts unique customer IDs;
 - sort plans alphabetically and reset the index;
 - leave the input DataFrame unchanged.
 
 ## Check
 
 Run the tests. Add a plan with one customer and make sure both its count and
-rate remain visible.
+rate remain visible. Then duplicate a customer ID and confirm that the function
+rejects the ambiguous row grain instead of silently giving that customer extra
+weight.
 
 ## Explain
 

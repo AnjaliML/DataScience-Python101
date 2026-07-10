@@ -173,6 +173,11 @@ and the consequences rebuilt.
 3. Change one input byte and confirm its checksum changes.
 4. Ask a classmate to rebuild the result without verbal instructions.
 
+## Guided practice journey
+
+[Work through Try → Hint 1 → Hint 2 → rubric → worked reasoning](../practice/11-reproducibility.md).
+You will complete a provenance record before testing it from a clean state.
+
 ## Keep going
 
 The next lesson gives this reproducible project one narrow command-line front
