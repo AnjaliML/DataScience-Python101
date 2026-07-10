@@ -1,0 +1,94 @@
+site_name: Data Science Python 101
+site_description: Evidence-first Python foundations for data science.
+site_author: Anjali Suman
+site_url: https://anjaliml.github.io/DataScience-Python101/
+repo_url: https://github.com/AnjaliML/DataScience-Python101
+repo_name: AnjaliML/DataScience-Python101
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Anjali Suman · MIT License
+
+theme:
+  name: material
+  language: en
+  font: false
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: ds-light
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: ds-dark
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - content.code.copy
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - toc.follow
+
+nav:
+  - Home: index.md
+  - Start:
+      - Course overview: start/overview.md
+      - Set up once: start/setup.md
+      - How to learn: start/how-to-learn.md
+  - Lessons:
+      - "01 · Ask an answerable question": lessons/01-questions.md
+      - "02 · Python values and expressions": lessons/02-python-basics.md
+      - "03 · Functions and control flow": lessons/03-functions-control.md
+      - "04 · NumPy arrays": lessons/04-numpy.md
+      - "05 · pandas DataFrames": lessons/05-pandas.md
+      - "06 · Clean and validate data": lessons/06-cleaning.md
+      - "07 · Explore and visualise": lessons/07-visualization.md
+      - "08 · Statistics and uncertainty": lessons/08-statistics.md
+      - "09 · Start with a baseline": lessons/09-modeling.md
+      - "10 · Evaluate honestly": lessons/10-evaluation.md
+      - "11 · Reproducible projects": lessons/11-reproducibility.md
+      - "12 · Turn analysis into a tool": lessons/12-tools.md
+      - "13 · Capstone": lessons/13-capstone.md
+  - Reference:
+      - Python syntax map: reference/syntax-map.md
+      - Command line and Git: reference/command-line-git.md
+      - Data-science checklist: reference/checklist.md
+  - About:
+      - For instructors: about/instructors.md
+      - Contributing: about/contributing.md
+      - License: about/license.md
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search
+
+validation:
+  absolute_links: warn
+  omitted_files: warn
+  unrecognized_links: warn
