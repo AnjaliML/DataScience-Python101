@@ -32,6 +32,11 @@ the wrong axis should fail your new test. Also try `np.nan`, `np.inf`, and
 `ValueError` before standardisation. A complex-valued matrix must also raise
 `ValueError` rather than silently losing its imaginary component.
 
+Finally, test very large but finite values. A direct mean or standard deviation
+can overflow even when every input is finite. Form relative offsets first and
+scale those offsets into a bounded range before calculating their mean and
+standard deviation.
+
 ## Explain
 
 Why must scaling parameters later be fitted only on training rows?

@@ -124,16 +124,20 @@
 
     const focusable = visibleFocusable(dialog);
     if (!focusable.length) return;
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
+    const currentIndex = focusable.indexOf(document.activeElement);
+    const nextIndex =
+      currentIndex < 0
+        ? event.shiftKey
+          ? focusable.length - 1
+          : 0
+        : (currentIndex + (event.shiftKey ? -1 : 1) + focusable.length) %
+          focusable.length;
 
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      focusWithoutScroll(last);
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      focusWithoutScroll(first);
-    }
+    // Material closes mobile search during its own Tab handling. Intercept the
+    // key before it reaches that handler and move focus within the dialog.
+    event.preventDefault();
+    event.stopPropagation();
+    focusWithoutScroll(focusable[nextIndex]);
   };
 
   const addMediaListener = (query) => {
@@ -165,18 +169,22 @@
       }
     });
 
-    document.addEventListener("keydown", (event) => {
-      trapSearchFocus(event);
-      if (event.defaultPrevented || event.key !== "Escape") return;
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        trapSearchFocus(event);
+        if (event.defaultPrevented || event.key !== "Escape") return;
 
-      if (getToggle("search")?.checked) {
-        event.preventDefault();
-        setOpen("search", false, document.activeElement);
-      } else if (getToggle("drawer")?.checked) {
-        event.preventDefault();
-        setOpen("drawer", false, document.activeElement);
-      }
-    });
+        if (getToggle("search")?.checked) {
+          event.preventDefault();
+          setOpen("search", false, document.activeElement);
+        } else if (getToggle("drawer")?.checked) {
+          event.preventDefault();
+          setOpen("drawer", false, document.activeElement);
+        }
+      },
+      { capture: true },
+    );
 
     ["drawer", "search"].forEach((name) => {
       getToggle(name)?.addEventListener("change", (event) => {

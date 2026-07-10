@@ -206,6 +206,8 @@ def test_application_shell_uses_named_button_controls() -> None:
     assert 'id="site-navigation"' in navigation
     assert "Escape" in javascript and "restoreFocus" in javascript
     assert 'setAttribute("aria-expanded"' in javascript
+    assert "event.stopPropagation()" in javascript
+    assert "{ capture: true }" in javascript
 
 
 def test_tables_gain_a_named_keyboard_scroll_region() -> None:

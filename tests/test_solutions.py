@@ -36,6 +36,20 @@ def test_numpy_solution() -> None:
     assert np.allclose(result.mean(axis=0), 0)
 
 
+def test_numpy_solution_standardises_extreme_finite_values() -> None:
+    solution = load_solution("solutions/03-numpy/solution.py")
+    matrix = np.array(
+        [[1e308, 1], [1e308 - 1e292, 2], [1e308 - 2e292, 3]],
+        dtype=float,
+    )
+
+    result = solution.standardize_columns(matrix)
+
+    assert np.isfinite(result).all()
+    assert np.allclose(result.mean(axis=0), 0, atol=1e-12)
+    assert np.allclose(result.std(axis=0), 1, atol=1e-12)
+
+
 @pytest.mark.parametrize("non_finite", [np.nan, np.inf, -np.inf])
 def test_numpy_solution_rejects_non_finite_values(non_finite: float) -> None:
     solution = load_solution("solutions/03-numpy/solution.py")

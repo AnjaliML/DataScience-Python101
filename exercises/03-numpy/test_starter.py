@@ -14,6 +14,19 @@ def test_standardises_columns_without_mutation() -> None:
     assert np.array_equal(matrix, original)
 
 
+def test_standardises_extreme_finite_values() -> None:
+    matrix = np.array(
+        [[1e308, 1], [1e308 - 1e292, 2], [1e308 - 2e292, 3]],
+        dtype=float,
+    )
+
+    result = standardize_columns(matrix)
+
+    assert np.isfinite(result).all()
+    assert np.allclose(result.mean(axis=0), 0, atol=1e-12)
+    assert np.allclose(result.std(axis=0), 1, atol=1e-12)
+
+
 @pytest.mark.parametrize(
     "matrix",
     [
